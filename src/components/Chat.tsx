@@ -11,11 +11,21 @@ import { Send, Loader2} from 'lucide-react'
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 
+// Defina a interface para a mensagem
+interface Message {
+  role: string;
+  content: string;
+  id: string;
+}
+
 export function Chat() {
-  const { messages, input, handleInputChange, isLoading, error, reload, stop } = useChat({
+  const { messages: initialMessages, input, handleInputChange, isLoading, error, reload, stop } = useChat({
     api: '/api/chat',
-  }) 
+  });
   
+  // Defina o estado de mensagens com o tipo correto
+  const [messages, setMessages] = useState<Message[]>(initialMessages || []); // Inicialize o estado de mensagens
+
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const [autoScroll, setAutoScroll] = useState(true)
   const { toast } = useToast()
@@ -41,40 +51,39 @@ export function Chat() {
     }
   }, [error, toast])
 
-  const handleScroll = () => {
-    if (scrollAreaRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = scrollAreaRef.current
-      const atBottom = scrollHeight - scrollTop === clientHeight
-      setAutoScroll(atBottom)
-    }
-  }
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => { 
     event.preventDefault();
-    if (isLoading) return; // Evita múltiplos envios
+    if (isLoading) return; 
 
     try {
+      const userMessage: Message = { role: 'user', content: input, id: Date.now().toString() };
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ messages: [...messages, { role: 'user', content: input }] }),
+        body: JSON.stringify({ messages: [...messages, userMessage] })
       });
 
-      
       if (!response.ok) {
         const errorText = await response.text(); 
         console.error('Erro na resposta da API:', errorText);
         throw new Error(`Erro na API: ${errorText}`);
       }
-
+     
       const data = await response.json();
       console.log('Resposta da API:', data);
-
-      messages.push({ role: 'user', content: input });
-      messages.push({ role: 'assistant', content: data.content });
-      handleInputChange({ target: { value: '' } }); 
+      
+      // Atualize o estado de mensagens corretamente
+      setMessages(prevMessages => [
+        ...prevMessages,
+        userMessage,
+        { role: 'assistant', content: data.content, id: Date.now().toString() }
+      ]);
+      
+      // Simule um evento de entrada para limpar o campo de entrada
+      handleInputChange({ target: { value: '' } } as React.ChangeEvent<HTMLInputElement>); 
     } catch (error) {
       console.error('Erro ao enviar mensagem:', error);
     }
