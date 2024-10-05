@@ -19,7 +19,7 @@ export async function POST(req: Request) {
         const response = await hf.chatCompletion({
             model: 'mistralai/Mistral-7B-Instruct-v0.2', // Modelo que suporta português ou usar o 'gpt2' .
             messages: messages.map((message: { role: string; content: string }) => ({ role: message.role, content: message.content })),
-            max_tokens: 100, 
+            max_tokens: 100,
         });
 
         console.log('Resposta da API:', response);
