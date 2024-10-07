@@ -1,7 +1,7 @@
 'use client'
 
 import { useChat } from 'ai/react'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardTitle, CardFooter, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -105,12 +105,13 @@ export function Chat() {
           </Alert>
         </div>
       )}
-      <Card className="w-full max-w-[400px] h-[700px] grid grid-rows-[auto_1fr_auto] mt-16"> 
+      <Card className="w-full  max-w-[400px] h-[900px] grid grid-rows-[auto_1fr_auto] mt-16"> 
         <CardHeader>
+          <CardTitle>Bem-vindo ao Chat do PH</CardTitle>
           <CardDescription>Sinta-se à vontade para conversar! Suas mensagens não serão salvas.</CardDescription>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="h-[600px] w-full overflow-auto pr-4" ref={scrollAreaRef}>
+          <ScrollArea className="h-[700px] w-full overflow-auto pr-4" ref={scrollAreaRef}>
             {messages.slice(-10).map((message, index) => (
               <div key={message.id || index} className={cn(
                 "flex gap-3 text-sm mb-4",
