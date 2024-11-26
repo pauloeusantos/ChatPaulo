@@ -1,16 +1,17 @@
 'use client'
 
-import { useChat } from 'ai/react'
-import { Card, CardContent, CardDescription, CardTitle, CardFooter, CardHeader } from "@/components/ui/card"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { useRef, useEffect, useState } from 'react'
-import { Send, Loader2, CircleAlert } from 'lucide-react'
-import { useToast } from "@/hooks/use-toast"
-import { cn } from "@/lib/utils"
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"; 
+
+import { useChat } from 'ai/react';
+import { Card, CardContent, CardDescription, CardTitle, CardFooter, CardHeader } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useRef, useEffect, useState } from 'react';
+import { Send, Loader2, Info } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 interface Message {
   role: string;
@@ -25,18 +26,13 @@ export function Chat() {
 
   const [messages, setMessages] = useState<Message[]>(initialMessages || []);
   const [showAlert, setShowAlert] = useState(true);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-
-  useEffect(() => {
-    console.log('Mensagens atualizadas:', messages)
-  }, [messages]);
 
   useEffect(() => {
     if (error) {
       console.error('Erro no chat:', error);
       toast({
-        title: "Error",
+        title: "Erro",
         description: error.message,
         variant: "destructive",
       });
@@ -46,10 +42,9 @@ export function Chat() {
   useEffect(() => {
     if (showAlert) {
       const timer = setTimeout(() => {
-        setShowAlert(false); 
-      }, 2000); 
-
-      return () => clearTimeout(timer); 
+        setShowAlert(false);
+      }, 2000);
+      return () => clearTimeout(timer);
     }
   }, [showAlert]);
 
@@ -59,7 +54,7 @@ export function Chat() {
 
     const userMessage: Message = { role: 'user', content: input, id: Date.now().toString() };
     await sendMessage(userMessage);
-  }
+  };
 
   const sendMessage = async (userMessage: Message) => {
     try {
@@ -78,7 +73,6 @@ export function Chat() {
       }
 
       const data = await response.json();
-      console.log('Resposta da API:', data);
 
       setMessages(prevMessages => [
         ...prevMessages,
@@ -90,28 +84,28 @@ export function Chat() {
     } catch (error) {
       console.error('Erro ao enviar mensagem:', error);
     }
-  }
+  };
 
   return (
     <>
       {showAlert && (
         <div className="fixed top-0 left-0 right-0 z-50 p-4 flex justify-center">
-          <Alert className="w-full max-w-md bg-black text-white"> 
-            <CircleAlert className="size-5 fill-white" />
-            <AlertTitle>Atenção</AlertTitle>
+          <Alert className="w-full max-w-md bg-[#e0f7f5] text-[#00796b] border border-[#00bfa6]">
+            <Info className="w-5 h-5 text-[#00bfa6]" />
+            <AlertTitle className="font-semibold">Atenção</AlertTitle>
             <AlertDescription>
               Nenhuma mensagem será salva. Fique à vontade para conversar!
             </AlertDescription>
           </Alert>
         </div>
       )}
-      <Card className="w-full  max-w-[400px] h-[900px] grid grid-rows-[auto_1fr_auto] mt-16"> 
-        <CardHeader>
-          <CardTitle>Bem-vindo ao Chat do PH</CardTitle>
-          <CardDescription>Sinta-se à vontade para conversar! Suas mensagens não serão salvas.</CardDescription>
+      <Card className="w-full max-w-[400px] h-[900px] grid grid-rows-[auto_1fr_auto] mt-16  to-white shadow-xl rounded-lg">
+        <CardHeader className="bg-[#00bfa6] text-white rounded-t-lg">
+          <CardTitle className="text-xl font-bold">Chat MyPeace</CardTitle>
+          <CardDescription className="text-semibold">Sinta-se à vontade para conversar! Suas mensagens não serão salvas.</CardDescription>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="h-[700px] w-full overflow-auto pr-4" ref={scrollAreaRef}>
+          <ScrollArea className="h-[700px] w-full overflow-auto pr-4">
             {messages.slice(-10).map((message, index) => (
               <div key={message.id || index} className={cn(
                 "flex gap-3 text-sm mb-4",
@@ -122,11 +116,13 @@ export function Chat() {
                   message.role === 'user' ? "flex-row-reverse" : ""
                 )}>
                   <Avatar>
-                    <AvatarFallback>{message.role === 'user' ? 'YOU' : 'AI'}</AvatarFallback>
+                    <AvatarFallback className="bg-[#00bfa6] text-white">
+                      {message.role === 'user' ? 'YOU' : 'AI'}
+                    </AvatarFallback>
                   </Avatar>
                   <div className={cn(
-                    "rounded-lg p-3",
-                    message.role === 'user' ? "bg-primary text-primary-foreground" : "bg-muted"
+                    "rounded-lg p-3 shadow",
+                    message.role === 'user' ? "bg-[#00bfa6] text-white" : "bg-gray-200"
                   )}>
                     <p className="leading-relaxed break-words">{message.content}</p>
                   </div>
@@ -135,28 +131,31 @@ export function Chat() {
             ))}
             {isLoading && (
               <div className="flex justify-center items-center py-4">
-                <Loader2 className="h-6 w-6 animate-spin" />
+                <Loader2 className="h-6 w-6 animate-spin text-[#00bfa6]" />
               </div>
             )}
           </ScrollArea>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="bg-white rounded-b-lg p-4">
           <form className="w-full space-y-2" onSubmit={handleSubmit}>
             <div className="flex gap-2">
-              <Input 
-                placeholder="Type your message" 
-                value={input} 
+              <Input
+                placeholder="Digite sua mensagem"
+                value={input}
                 onChange={handleInputChange}
                 disabled={isLoading}
+                className="border border-[#00bfa6] focus:ring-[#00bfa6] rounded-lg"
               />
-              <Button type="submit" disabled={isLoading || !input.trim()}>
+              <Button
+                type="submit"
+                disabled={isLoading || !input.trim()}
+                className="bg-[#00bfa6] hover:bg-[#008f7a] text-white font-bold rounded-lg px-4">
                 <Send className="h-4 w-4" />
-                <span className="sr-only">Send</span>
               </Button>
             </div>
           </form>
         </CardFooter>
       </Card>
     </>
-  )
+  );
 }

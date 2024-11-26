@@ -1,6 +1,7 @@
 import { StreamingTextResponse } from 'ai';
 import { HfInference } from '@huggingface/inference';
 
+
 export const runtime = 'edge';
 
 const hf = new HfInference(process.env.HUGGINGFACE_API_KEY);
